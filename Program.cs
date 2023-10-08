@@ -229,7 +229,7 @@ app.MapPut("/api/WorkFlow", async (string custId, WorkFlowDto prog, IMapper mapp
 
 //SUMMARY ENDPOINT
 
-app.MapGet("/api/WorkFlow", async (string custId, IMapper mapper, [FromServices] IWorkFlow _workFlowService, [FromServices] IApplicationForm _appFormService, [FromServices] IProgramDetails _programDetailsService) =>
+app.MapGet("/api/Summary", async (string custId, IMapper mapper, [FromServices] IWorkFlow _workFlowService, [FromServices] IApplicationForm _appFormService, [FromServices] IProgramDetails _programDetailsService) =>
 {
     var response = new BaseResponse();
     var data = await _workFlowService.GetWorkFlow(custId);
