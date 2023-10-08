@@ -29,6 +29,7 @@ var app = builder.Build();
 
 // Programs Details EndPoints
 
+
 app.MapPost("/api/ProgramsDetails", async ([FromBody] ProgramDetailsDto prog, IMapper mapper, [FromServices] IProgramDetails _programDetailsService) =>
 {
     var response = new BaseResponse();
@@ -221,6 +222,55 @@ app.MapPut("/api/WorkFlow", async (string custId, WorkFlowDto prog, IMapper mapp
     response.Message = Messages.SUCCESS_MESSAGE;
     response.Id = custId;
     response.Data = prog;
+    return Results.Ok(response);
+
+});
+
+
+//SUMMARY ENDPOINT
+
+app.MapGet("/api/WorkFlow", async (string custId, IMapper mapper, [FromServices] IWorkFlow _workFlowService, [FromServices] IApplicationForm _appFormService, [FromServices] IProgramDetails _programDetailsService) =>
+{
+    var response = new BaseResponse();
+    var data = await _workFlowService.GetWorkFlow(custId);
+    if (data is null)
+    {
+        response.Code = Messages.FAILURE_CODE;
+        response.Message = "Unable to find customer details";
+        return Results.BadRequest(response);
+    }
+    var appData = await _appFormService.GetApplicationForm(custId);
+    if (appData is null)
+    {
+        response.Code = Messages.FAILURE_CODE;
+        response.Message = "Unable to find customer details";
+        return Results.BadRequest(response);
+    }
+    var progData= await _programDetailsService.GetProgramDetails(custId);
+    if (progData is null)
+    {
+        response.Code = Messages.FAILURE_CODE;
+        response.Message = "Unable to find customer details";
+        return Results.BadRequest(response);
+    }
+
+   
+
+    var dtoData = mapper.Map<WorkFlowDto>(data);
+    var dtoAppData = mapper.Map<ApplicationFormDto>(appData);
+    var dtoProgData = mapper.Map<ProgramDetailsDto>(appData);
+    var dto = new SummaryDataDto
+    {
+        WorkFlowInfo = dtoData,
+        applicationFormInfo = dtoAppData,
+        ProgramDetailsInfo = dtoProgData
+
+    };
+
+    response.Code = Messages.SUCCESS_CODE;
+    response.Message = Messages.SUCCESS_MESSAGE;
+    response.Id = custId;
+    response.Data = dto;
     return Results.Ok(response);
 
 });
